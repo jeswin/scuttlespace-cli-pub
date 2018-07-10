@@ -28,14 +28,14 @@ import modify from "./modify";
   # Post with a slug
   pub post some-message-id slug gullivers-travels
 
+  # Delete the post on the same thread
+  pub delete
+
+  # Delete a post by message id
   pub delete some-message-id
+
+  # Delete a post by slug
   pub delete <slug>
-
-  power
-  
-  pub index order date
-
-  pub index 
 */
 
 let authService: typeof authServiceModule = authServiceModule;
