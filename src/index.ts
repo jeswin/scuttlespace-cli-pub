@@ -1,17 +1,17 @@
 import humanist from "humanist";
 import pg = require("pg");
-import { Response } from "scuttlespace-cli-common";
-import * as authServiceModule from "scuttlespace-service-auth";
+import { Response } from "scuttlespace-cli-common/dist";
+// import * as pubServiceModule from "scuttlespace-service-pub";
 import { ICallContext } from "standard-api";
-import createOrRename from "./create-or-rename";
-import modify from "./modify";
+import post from "./post";
+
 /*
   Supported commands
   
   Posts
   ------------------
   # Post first message in thread
-  pub post 
+  pub post
 
   # Post by message id
   pub post some-message-id
@@ -38,22 +38,13 @@ import modify from "./modify";
   pub delete <slug>
 */
 
-let authService: typeof authServiceModule = authServiceModule;
+// let pubService: typeof pubServiceModule = pubServiceModule;
 
-export function inject(mods: { auth: typeof authServiceModule }) {
-  authService = mods.auth;
-}
+// export function inject(mods: { auth: typeof pubServiceModule }) {
+//   pubService = mods.auth;
+// }
 
-const parser = humanist([
-  ["id", "single"],
-  ["about", "multi", { join: true }],
-  ["domain", "single"],
-  ["link", "single"],
-  ["delink", "single"],
-  ["enable", "flag"],
-  ["disable", "flag"],
-  ["destroy", "flag"]
-]);
+const parser = humanist([["post", "flag"], ["post", "single"]]);
 
 export interface IHostSettings {
   hostname: string;
@@ -69,29 +60,12 @@ export default async function handle(
 ) {
   const lcaseCommand = command.toLowerCase();
 
-  return lcaseCommand.startsWith("user ")
+  return lcaseCommand.startsWith("pub ")
     ? await (async () => {
         const args: any = parser(command);
         try {
-          const resp = args.id
-            ? await createOrRename(
-                args.id,
-                sender,
-                messageId,
-                pool,
-                hostSettings,
-                context,
-                authService
-              )
-            : await modify(
-                args,
-                sender,
-                messageId,
-                pool,
-                hostSettings,
-                context,
-                authService
-              );
+          const resp =
+            typeof args.post !== "undefined" ? await post : undefined;
           return resp;
         } catch (ex) {
           return new Response(

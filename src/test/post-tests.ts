@@ -1,10 +1,9 @@
 import "mocha";
-import { ValidResult } from "scuttlespace-api-common";
+import { ValidResult, ErrorResult } from "scuttlespace-api-common";
 import * as authService from "scuttlespace-service-auth";
-import { CreateOrRenameAccountResult } from "scuttlespace-service-auth";
 import "should";
-import authCLI from "../";
-import { inject } from "../";
+import authCLI from "..";
+import { inject } from "..";
 
 const shouldLib = require("should");
 
@@ -12,18 +11,17 @@ const mockDbPool: any = {};
 const mockContext = { id: "context-id" };
 
 export default function() {
-  describe("create and rename accounts", () => {
-    it("creates a user", async () => {
+  describe("modify accounts", () => {
+    it("enables a user", async () => {
       inject({
         auth: {
           ...authService,
-          createOrRenameAccount: async () =>
-            new ValidResult(CreateOrRenameAccountResult.Created)
+          enableAccount: async () => new ValidResult({ username: "jeswin" })
         }
       });
 
       const resp = await authCLI(
-        "user id jeswin",
+        "user enable",
         "msg-id",
         "jpk001",
         mockDbPool,
@@ -33,23 +31,20 @@ export default function() {
 
       shouldLib.exist(resp);
       if (resp) {
-        resp.message.should.equal(
-          "Your profile is accessible at https://example.com/jeswin."
-        );
+        resp.message.should.equal("The user jeswin has been enabled.");
       }
     });
 
-    it("renames a user", async () => {
+    it("disables a user", async () => {
       inject({
         auth: {
           ...authService,
-          createOrRenameAccount: async () =>
-            new ValidResult(CreateOrRenameAccountResult.Renamed)
+          disableAccount: async () => new ValidResult({ username: "jeswin" })
         }
       });
 
       const resp = await authCLI(
-        "user id jeswin",
+        "user disable",
         "msg-id",
         "jpk001",
         mockDbPool,
@@ -59,23 +54,20 @@ export default function() {
 
       shouldLib.exist(resp);
       if (resp) {
-        resp.message.should.equal(
-          "Your profile is now accessible at https://example.com/jeswin."
-        );
+        resp.message.should.equal("The user jeswin has been disabled.");
       }
     });
 
-    it("fails if the username exists", async () => {
+    it("deletes a user", async () => {
       inject({
         auth: {
           ...authService,
-          createOrRenameAccount: async () =>
-            new ValidResult(CreateOrRenameAccountResult.Taken)
+          destroyAccount: async () => new ValidResult({ username: "jeswin" })
         }
       });
 
       const resp = await authCLI(
-        "user id jeswin",
+        "user destroy",
         "msg-id",
         "jpk001",
         mockDbPool,
@@ -85,23 +77,24 @@ export default function() {
 
       shouldLib.exist(resp);
       if (resp) {
-        resp.message.should.equal(
-          "The id 'jeswin' already exists. Choose a different id."
-        );
+        resp.message.should.equal("The user jeswin has been deleted.");
       }
     });
 
-    it("skips renaming if username is already yours", async () => {
+    it("will not delete an active user", async () => {
       inject({
         auth: {
           ...authService,
-          createOrRenameAccount: async () =>
-            new ValidResult(CreateOrRenameAccountResult.Own)
+          destroyAccount: async () =>
+            new ErrorResult({
+              code: "CANNOT_DELETE_ACTIVE_ACCOUNT",
+              message: "lorem ipsum not deleted"
+            })
         }
       });
 
       const resp = await authCLI(
-        "user id jeswin",
+        "user destroy",
         "msg-id",
         "jpk001",
         mockDbPool,
@@ -112,7 +105,7 @@ export default function() {
       shouldLib.exist(resp);
       if (resp) {
         resp.message.should.equal(
-          "The id 'jeswin' is already yours and is accessible at https://example.com/jeswin."
+          "As a safety measure, the user needs to be disabled before deleting it. Say 'user disable'."
         );
       }
     });
