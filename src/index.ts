@@ -1,7 +1,8 @@
 import humanist from "humanist";
 import pg = require("pg");
-import { Response } from "scuttlespace-cli-common/dist";
 // import * as pubServiceModule from "scuttlespace-service-pub";
+import { IDbConfig } from "scuttlespace-api-common";
+import { Response } from "scuttlespace-cli-common";
 import { ICallContext } from "standard-api";
 import post from "./post";
 
@@ -50,11 +51,14 @@ export interface IHostSettings {
   hostname: string;
 }
 
-export default async function handle(
+export async function init(dbConfig: IDbConfig) {
+  // await authService.init(dbConfig);
+}
+
+export async function handle(
   command: string,
   messageId: string,
   sender: string,
-  pool: pg.Pool,
   hostSettings: IHostSettings,
   context: ICallContext
 ) {
@@ -65,7 +69,9 @@ export default async function handle(
         const args: any = parser(command);
         try {
           const resp =
-            typeof args.post !== "undefined" ? await post : undefined;
+            typeof args.post !== "undefined"
+              ? await post(args, sender, messageId, hostSettings, context)
+              : undefined;
           return resp;
         } catch (ex) {
           return new Response(

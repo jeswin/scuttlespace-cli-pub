@@ -10,7 +10,6 @@ export default async function post(
   args: any,
   externalId: string,
   messageId: string,
-  pool: pg.Pool,
   hostSettings: IHostSettings,
   context: ICallContext
   // pubService: typeof pubServiceModule
