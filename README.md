@@ -1,2 +1,2 @@
 # scuttlespace-cli-pub
-ScuttleSpace Pub CLI Module
+Scuttlespace Pub CLI Module
