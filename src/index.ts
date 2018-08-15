@@ -2,7 +2,7 @@ import humanist from "humanist";
 import pg = require("pg");
 // import * as pubServiceModule from "scuttlespace-service-pub";
 import { IDbConfig } from "scuttlespace-api-common";
-import { Response } from "scuttlespace-cli-common";
+import { Response } from "scuttlespace-commands-common";
 import { ICallContext } from "standard-api";
 import post from "./post";
 

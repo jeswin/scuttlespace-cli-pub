@@ -13,8 +13,6 @@
     "@types/pg": "^7.4.10",
     "humanist": "^0.0.4",
     "pg": "^7.4.3",
-    "scuttlespace-api-common": "^0.0.6",
-    "scuttlespace-cli-common": "^0.0.2",
     "standard-api": "^0.0.2",
     "switch-expr": "^0.0.1"
   },

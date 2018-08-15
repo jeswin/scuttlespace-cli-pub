@@ -1,6 +1,6 @@
 import pg = require("pg");
 import { parseServiceResult } from "scuttlespace-api-common";
-import { Response } from "scuttlespace-cli-common/dist";
+import { Response } from "scuttlespace-commands-common/dist";
 // import * as authServiceModule from "scuttlespace-service-auth";
 import { ICallContext } from "standard-api";
 import * as expr from "switch-expr";
